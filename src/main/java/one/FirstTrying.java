@@ -19,7 +19,7 @@ public class FirstTrying {
     public FirstTrying() {
         this.properties = new Properties();
         try {
-            this.properties.load(this.getClass().getClassLoader().getResourceAsStream("oneConfig.properties"));
+            this.properties.load(this.getClass().getClassLoader().getResourceAsStream("Config.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
