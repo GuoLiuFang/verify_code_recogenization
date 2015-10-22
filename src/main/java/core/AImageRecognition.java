@@ -87,7 +87,7 @@ public abstract class AImageRecognition implements IImageRecognition {
 
     private String getImageContentByImageName(String imageFileName) {
         String[] contentAndSuffix = imageFileName.split("[\\.]");
-        return contentAndSuffix[0];
+        return "" + contentAndSuffix[0].charAt(0);
     }
 
     public String recognitionAtom(BufferedImage bufferedImage) {
@@ -104,13 +104,13 @@ public abstract class AImageRecognition implements IImageRecognition {
     }
 
     private int matchDegree(BufferedImage standardImage, BufferedImage bufferedImage) {
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
+        int width = bufferedImage.getWidth() < standardImage.getWidth() ? bufferedImage.getWidth() : standardImage.getWidth();
+        int height = bufferedImage.getHeight() < standardImage.getHeight() ? bufferedImage.getHeight() : standardImage.getHeight();
         int matchPointsSum = 0;
 //        GoAway:
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (isWhite(bufferedImage.getRGB(x, y)) == isWhite(standardImage.getRGB(x, y))) {
+                if (isWhite(bufferedImage.getRGB(x, y)) == isWhite(standardImage.getRGB(x, y))) {//现在报这个错是因为，还没有标准图库。。其实不是这个原因而是因为作者的图片跟我的尺寸不一样。。
                     matchPointsSum++;
 //                    break GoAway;
                 }
