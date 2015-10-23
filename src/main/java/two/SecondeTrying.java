@@ -23,19 +23,33 @@ public class SecondeTrying extends AImageRecognition {
         List<BufferedImage> BufferedImageList = new ArrayList<BufferedImage>();
         List<Integer> xBreakPoints = getSplitPoints(bufferedImage, true);
         for (int i = 0; i < xBreakPoints.size(); i += 2) {
-            //对子图像默认包含像素点。。
-            BufferedImage xBuffredImage = bufferedImage.getSubimage(xBreakPoints.get(i), 0, xBreakPoints.get(i + 1) - xBreakPoints.get(i) + 1, bufferedImage.getHeight());
-            List<Integer> yBreakPoints = getSplitPoints(xBuffredImage, false);
-            BufferedImage xYBuffredImage = xBuffredImage.getSubimage(0, yBreakPoints.get(0), xBuffredImage.getWidth(), yBreakPoints.get(1) - yBreakPoints.get(0) + 1);
-            BufferedImageList.add(xYBuffredImage);
-            try {
-                ImageIO.write(xBuffredImage, "JPG", new File(super.getProperties().getProperty("tmpDirectory") + "SecondeTrying" + "--x-" + i + "-tmp" + ".jpg"));
-                ImageIO.write(xYBuffredImage, "JPG", new File(super.getProperties().getProperty("tmpDirectory") + "SecondeTrying" + "--xY-" + i + "-tmp" + ".jpg"));
-            } catch (IOException e) {
-                e.printStackTrace();
+            int xWidth = xBreakPoints.get(i + 1) - xBreakPoints.get(i) + 1;
+            int standardWidth = Integer.valueOf(super.getProperties().getProperty("standardWidth"));
+            if (xWidth > standardWidth) {
+                BufferedImageList.add(getSubSplittedImage(bufferedImage, xBreakPoints.get(i), 0, xWidth / 2, bufferedImage.getHeight()));
+                BufferedImageList.add(getSubSplittedImage(bufferedImage, xBreakPoints.get(i) + xWidth / 2, 0, xWidth / 2, bufferedImage.getHeight()));
+            } else {
+                BufferedImageList.add(getSubSplittedImage(bufferedImage, xBreakPoints.get(i), 0, xBreakPoints.get(i + 1) - xBreakPoints.get(i) + 1, bufferedImage.getHeight()));
             }
         }
         return BufferedImageList;
+    }
+
+    private BufferedImage getSubSplittedImage(BufferedImage bufferedImage, int x, int y, int width, int height) {
+        BufferedImage xBuffredImage = bufferedImage.getSubimage(x, 0, width, height);
+        List<Integer> yBreakPoints = getSplitPoints(xBuffredImage, false);
+        BufferedImage xYBuffredImage = xBuffredImage.getSubimage(0, yBreakPoints.get(0), xBuffredImage.getWidth(), yBreakPoints.get(1) - yBreakPoints.get(0) + 1);
+        try {
+            ImageIO.write(xBuffredImage, "JPG", new File(super.getProperties().getProperty("tmpDirectory") + "SecondeTrying" + x + "--x--tmp" + ".jpg"));
+            ImageIO.write(xYBuffredImage, "JPG", new File(super.getProperties().getProperty("tmpDirectory") + "SecondeTrying" + x + "--xY--tmp" + ".jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return xYBuffredImage;
+    }
+
+    public void splitImage(String imagesDirctoryPath) {
+
     }
 
     /**
@@ -62,7 +76,7 @@ public class SecondeTrying extends AImageRecognition {
         } else {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (isWhite(bufferedImage.getRGB(x,y))) {//这里始终是x,y
+                    if (isWhite(bufferedImage.getRGB(x, y))) {//这里始终是x,y
                         Distribution.add(y);
                         System.out.println("白点在y轴上的分布" + y);
                         break;
@@ -101,9 +115,11 @@ public class SecondeTrying extends AImageRecognition {
 
     public static void main(String[] args) {
         AImageRecognition trying = new SecondeTrying("SecondeTryingConfig.properties");
-        String resultMap = trying.recognition(trying.getProperties().getProperty("sourceFile"));
-        System.out.println("识别结果是：" + resultMap);
-//        Map<String, String> resultMap = trying.recognitionBatch(trying.getProperties().getProperty("sourceDirectory"));
-//        trying.writeRecognitionResult(trying.getProperties().getProperty("targetDirectory"), resultMap);
+//        String resultMap = trying.recognition(trying.getProperties().getProperty("sourceFile"));
+//        System.out.println("识别结果是：" + resultMap);
+
+
+        Map<String, String> resultMap = trying.recognitionBatch(trying.getProperties().getProperty("sourceDirectory"));
+        trying.writeRecognitionResult(trying.getProperties().getProperty("targetDirectory"), resultMap);
     }
 }

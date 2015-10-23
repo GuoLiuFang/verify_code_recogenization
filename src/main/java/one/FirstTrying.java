@@ -40,6 +40,10 @@ public class FirstTrying extends AImageRecognition {
         return bufferedImageList;
     }
 
+    public void splitImage(String imagesDirctoryPath) {
+
+    }
+
     public static void main(String[] args) {
         FirstTrying firstTrying = new FirstTrying("FirstTryingConfig.properties");
         Map<String, String> resultMap = firstTrying.recognitionBatch(firstTrying.getProperties().getProperty("sourceDirectory"));

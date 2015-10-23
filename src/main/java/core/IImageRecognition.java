@@ -15,6 +15,7 @@ public interface IImageRecognition {
 
     //图像分割方法族群，目前包括splitImage
     List<BufferedImage> splitImage(BufferedImage bufferedImage);
+    void splitImage(String imagesDirctoryPath);
 
     //训练方法族群，目前包括train
     Map<BufferedImage, String> train();

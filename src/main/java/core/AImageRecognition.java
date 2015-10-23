@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by LiuFangGuo on 10/21/15.
@@ -85,6 +86,31 @@ public abstract class AImageRecognition implements IImageRecognition {
         return this.imageContentMap;
     }
 
+    public void splitImage(String imagesDirctoryPath) {
+        File directory = new File(imagesDirctoryPath);
+        if (directory.isDirectory()) {
+            File[] fileArray = directory.listFiles();
+            List<BufferedImage> rawStandardImageList = new ArrayList<BufferedImage>();
+            for (File file : fileArray) {
+                try {
+                    BufferedImage bufferedImage = ImageIO.read(new File(file.getAbsolutePath()));
+                    rawStandardImageList.addAll(splitImage(bufferedImage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            int index = 0;
+            Random random = new Random();
+            for (BufferedImage rawStandardImage : rawStandardImageList) {
+                try {
+                    ImageIO.write(rawStandardImage, this.properties.getProperty("formatName"), new File(this.properties.getProperty("rawTrainDirectory") + random.nextInt() + "--" + (index++)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     private String getImageContentByImageName(String imageFileName) {
         String[] contentAndSuffix = imageFileName.split("[\\.]");
         return "" + contentAndSuffix[0].charAt(0);
@@ -122,7 +148,7 @@ public abstract class AImageRecognition implements IImageRecognition {
     public String recognition(String imagePath) {
         BufferedImage removedBgColorImage = removeBackgroud(imagePath);
         //split的时候应该保证顺序的一致性。
-        java.util.List<BufferedImage> imageList = splitImage(removedBgColorImage);
+        List<BufferedImage> imageList = splitImage(removedBgColorImage);
         if (this.imageContentMap == null) {
             train();
         }
